@@ -7,6 +7,7 @@ class Comment(models.Model):
     article=models.ForeignKey(Article, on_delete=models.CASCADE, related_name='comments')
 
     content=models.TextField()
+    is_approved=models.BooleanField(default=False)
     updated_at=models.DateTimeField(auto_now=True)
     created_at=models.DateTimeField(auto_now_add=True)
 
