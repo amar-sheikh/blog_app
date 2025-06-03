@@ -1,9 +1,9 @@
 from django.db import models
-from .auther import Auther
+from .author import Author
 from .tag import Tag
 
 class Article(models.Model):
-    author=models.ForeignKey(Auther, on_delete=models.CASCADE, related_name='articles')
+    author=models.ForeignKey(Author, on_delete=models.CASCADE, related_name='articles')
     tags=models.ManyToManyField(Tag, related_name='articles')
 
     title=models.CharField(max_length=255)

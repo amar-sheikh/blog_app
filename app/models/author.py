@@ -1,7 +1,7 @@
 from django.db import models
 from .user import User
 
-class Auther(models.Model):
+class Author(models.Model):
     user=models.OneToOneField(User, on_delete=models.CASCADE)
     bio=models.CharField(max_length=255, null=True)
     updated_at=models.DateTimeField(auto_now=True)

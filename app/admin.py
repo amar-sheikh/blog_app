@@ -1,12 +1,12 @@
 from django.contrib import admin
-from .models import Article, Auther, Comment, Tag, User
+from .models import Article, Author, Comment, Tag, User
 
 @admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
     pass
 
-@admin.register(Auther)
-class AutherAdmin(admin.ModelAdmin):
+@admin.register(Author)
+class AuthorAdmin(admin.ModelAdmin):
     pass
 
 @admin.register(Comment)
