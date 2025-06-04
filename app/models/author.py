@@ -16,6 +16,9 @@ class AuthorQuerySet(models.QuerySet):
     def with_published_articles(self):
         return self.filter(articles__is_published=True)
 
+    def with_un_published_articles(self):
+        return self.filter(articles__is_published=False)
+
     def with_tagged_articles(self, tag_names=None):
         if tag_names:
             return self.filter(articles__tags__name__in=tag_names).distinct()

@@ -52,6 +52,12 @@ class TestArticleQuerySet:
             assert Article.objects.published().count() == 1
             assert list(Article.objects.published()) == [published_article]
 
+    class TestUnPublished:
+        def test_returns_published_articles(self, published_article, un_published_article):
+            assert Article.objects.count() == 2
+            assert Article.objects.un_published().count() == 1
+            assert list(Article.objects.un_published()) == [un_published_article]
+
     class TestRecent:
 
         @pytest.fixture(autouse=True)

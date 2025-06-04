@@ -1,7 +1,7 @@
 from datetime import timedelta
 from django.db import models
 from django.db.models.aggregates import Count
-from django.db.models import Q
+from django.db.models import Q, Value
 from django.utils import timezone
 from .author import Author
 from .tag import Tag
@@ -9,6 +9,9 @@ from .tag import Tag
 class ArticleQuerySet(models.QuerySet):
     def published(self):
         return self.filter(is_published=True)
+
+    def un_published(self):
+        return self.filter(is_published=False)
 
     def recent(self, days=7):
         return self.published().filter(published_at__gte=timezone.now() - timedelta(days))
@@ -44,6 +47,7 @@ class ArticleQuerySet(models.QuerySet):
             self.recent(days)
                 .tagged(tag_names)
                 .with_approved_comments()
+                .annotate(hot=Value(True))
                 .distinct()
         )
 
@@ -55,6 +59,7 @@ class ArticleQuerySet(models.QuerySet):
             self
                 .hot_articles(days, tag_names)
                 .with_approved_comments(min_comments)
+                .annotate(trending=Value(True))
                 .order_by('-approved_comments_count', '-published_at')[:5]
         )
 

@@ -126,6 +126,12 @@ class TestAuthorQuerySet:
             assert Author.objects.with_published_articles().count() == 1
             assert list(Author.objects.with_published_articles()) == [author_with_published_article]
 
+    class TestWithUnPublishedArticles:
+        def test_returns_authors_with_published_articles(self, author_without_published_article):
+            assert Author.objects.count() == 2
+            assert Author.objects.with_un_published_articles().count() == 1
+            assert list(Author.objects.with_un_published_articles()) == [author_without_published_article]
+
     class TestWithTaggedArticles:
 
         @pytest.fixture
