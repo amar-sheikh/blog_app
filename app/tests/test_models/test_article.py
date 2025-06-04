@@ -233,8 +233,8 @@ class TestArticleQuerySet:
 
         def test_returns_matching_author_name(self, article_by_author1):
             assert Article.objects.count() == 2
-            assert Article.objects.by_author('user1').count() == 1
-            assert list(Article.objects.by_author('user1')) == [article_by_author1]
+            assert Article.objects.by_author(['User1']).count() == 1
+            assert list(Article.objects.by_author(['User1'])) == [article_by_author1]
 
     class TestHotArticles:
 

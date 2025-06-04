@@ -36,8 +36,8 @@ class ArticleQuerySet(models.QuerySet):
     def search(self, text):
         return self.filter(Q(title__icontains=text) | Q(content__icontains=text))
 
-    def by_author(self, author_name):
-        return self.filter(author__user__username__icontains=author_name)
+    def by_author(self, author_names):
+        return self.filter(author__user__username__in=author_names)
 
     def hot_articles(self, days=7, tag_names=None):
         return (
