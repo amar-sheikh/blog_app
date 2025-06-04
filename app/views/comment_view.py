@@ -19,7 +19,7 @@ class CommentListView(ListView):
             queryset = queryset.approved()
 
         if approved == 'False':
-            queryset = queryset.un_approved()
+            queryset = queryset.non_approved()
         
         if user_id:
             queryset = queryset.by_user(user_id)
