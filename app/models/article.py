@@ -36,6 +36,9 @@ class ArticleQuerySet(models.QuerySet):
     def search(self, text):
         return self.filter(Q(title__icontains=text) | Q(content__icontains=text))
 
+    def by_author(self, author_name):
+        return self.filter(author__user__username__icontains=author_name)
+
     def hot_articles(self, days=7, tag_names=None):
         return (
             self.recent(days)
@@ -44,21 +47,15 @@ class ArticleQuerySet(models.QuerySet):
                 .distinct()
         )
 
-    def trending(self, tags_names, min_comments=5, days=7):
+    def trending(self, min_comments=5, days=3, tag_names=None):
         if min_comments < 5:
             raise ValueError("count can't be less than 5")
 
-        recent_date = timezone.now() - timezone.timedelta(days=days)
-        experienced_authors = Author.objects.filter(
-            articles__published_at__lt=recent_date,
-            articles__is_published=True
-        ).distinct()
-
         return (
-            self.hot_articles(days, tag_names=tags_names)
+            self
+                .hot_articles(days, tag_names)
                 .with_approved_comments(min_comments)
-                .filter(author__in=experienced_authors)
-                .distinct()
+                .order_by('-approved_comments_count', '-published_at')[:5]
         )
 
 class Article(models.Model):

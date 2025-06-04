@@ -16,23 +16,27 @@ class AuthorQuerySet(models.QuerySet):
     def with_published_articles(self):
         return self.filter(articles__is_published=True)
 
-    def with_tagged_articles(self, tag_name=None):
-        if tag_name:
-            return self.filter(articles__tags__name=tag_name)
-        return self.filter(articles__tags__isnull=False)
+    def with_tagged_articles(self, tag_names=None):
+        if tag_names:
+            return self.filter(articles__tags__name__in=tag_names).distinct()
+        return self.filter(articles__tags__isnull=False).distinct()
 
-    def top_active_authors(self, tag_name, since_date):
+    def top_active_authors(self, date_time, tag_names=None, min_comments=5):
+        if min_comments < 5:
+            raise ValueError("count can't be less than 5")
+
         return (
-            self.active_after(since_date)
-                .with_tagged_articles(tag_name)
+            self.active_since(date_time)
+                .with_tagged_articles(tag_names)
                 .annotate(
                     approved_comment_count=Count(
-                        "comment",
-                        filter=Q(comment__is_approved=True),
+                        "articles__comments",
+                        filter=Q(articles__comments__is_approved=True),
                         distinct=True
                     )
                 )
-                .filter(approved_comment_count__gte=5)
+                .filter(approved_comment_count__gte=min_comments)
+                .order_by('-approved_comment_count')
         )
 
 class Author(models.Model):
