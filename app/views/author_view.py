@@ -7,6 +7,7 @@ class AuthorListView(ListView):
     model = Author
     context_object_name = 'authors'
     template_name = 'authors/author_list.html'
+    paginate_by = 10
 
     def get_queryset(self):
         top_active_authors = bool(self.request.GET.get('top_active_authors', 0))

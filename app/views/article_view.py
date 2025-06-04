@@ -5,6 +5,7 @@ class ArticleListView(ListView):
     model = Article
     context_object_name = 'articles'
     template_name = 'articles/article_list.html'
+    paginate_by = 20
 
     def get_queryset(self):
         search = self.request.GET.get('search', '')

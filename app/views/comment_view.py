@@ -7,6 +7,7 @@ class CommentListView(ListView):
     model = Comment
     context_object_name = 'comments'
     template_name = 'comments/comment_list.html'
+    paginate_by = 20
 
     def get_queryset(self):
         approved = self.request.GET.get('approved', 'all')
