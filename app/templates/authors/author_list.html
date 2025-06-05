@@ -17,6 +17,10 @@
 		.w-400 {
 			width: 400px;
 		}
+		select option:checked {
+			background-color: gray;
+			color: white;
+		}
 	</style>
 </head>
 
@@ -151,24 +155,27 @@
 		</tbody>
 	</table>
 	<hr>
-	<div class="pagination">
-		{% with request.GET.urlencode as query_string %}
-			<span class="step-links">
-				{% if page_obj.has_previous %}
-					<a href="?{{ query_string }}&page=1">&laquo; first</a>
-					<a href="?{{ query_string }}&page={{ page_obj.previous_page_number }}">previous</a>
-				{% endif %}
+	<div class="d-flex justify-content-center">
 
-				<span class="current">
-					Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+		<div class="pagination">
+			{% with request.GET.urlencode as query_string %}
+				<span class="step-links">
+					{% if page_obj.has_previous %}
+						<a href="?{{ query_string }}&page=1">&laquo; first</a>
+						<a href="?{{ query_string }}&page={{ page_obj.previous_page_number }}">previous</a>
+					{% endif %}
+
+					<span class="current">
+						Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+					</span>
+
+					{% if page_obj.has_next %}
+						<a href="?{{ query_string }}&page={{ page_obj.next_page_number }}">next</a>
+						<a href="?{{ query_string }}&page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+					{% endif %}
 				</span>
-
-				{% if page_obj.has_next %}
-					<a href="?{{ query_string }}&page={{ page_obj.next_page_number }}">next</a>
-					<a href="?{{ query_string }}&page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
-				{% endif %}
-			</span>
-		{% endwith %}
+			{% endwith %}
+		</div>
 	</div>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
 		integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"

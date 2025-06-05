@@ -27,27 +27,26 @@ class ArticleListView(ListView):
             queryset = queryset.by_author(author_names)
 
         if special == 'hot':
-            with_approved_comment = True
-            published = 'True'
             comments_count = max(comments_count, 1)
             days = max(days, 7)
             queryset = Article.objects.hot_articles(days=days, tag_names=tag_names)
         elif special == 'trending':
-            with_approved_comment = True
-            published = 'True'
             comments_count = max(comments_count, 5)
             days = max(days, 3)
-            queryset = Article.objects.trending(
+            return Article.objects.trending(
                 days=days,
                 min_comments=comments_count,
                 tag_names=tag_names
-            )
+            ).select_related('author__user')
         else:
             if tagged:
                 queryset = queryset.tagged(tag_names)
 
-            if with_approved_comment and comments_count > 0:
-                queryset = queryset.with_approved_comments(comments_count)
+            if with_approved_comment:
+                if comments_count > 0:
+                    queryset = queryset.with_approved_comments(comments_count)
+                else:
+                    queryset = queryset.with_approved_comments(1)
 
             if published == 'True':
                 queryset = queryset.published()
@@ -57,7 +56,7 @@ class ArticleListView(ListView):
             if days > 0:
                 queryset = queryset.recent(days)
 
-        return queryset.select_related('author__user')
+        return queryset.order_by('id').select_related('author__user')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

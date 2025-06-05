@@ -1,7 +1,5 @@
 from app.models import Comment, User
-from datetime import timedelta
 from django.views.generic import ListView
-from django.utils import timezone
 
 class CommentListView(ListView):
     model = Comment
@@ -24,7 +22,7 @@ class CommentListView(ListView):
         if user_id:
             queryset = queryset.by_user(user_id)
 
-        return queryset.select_related('user', 'article')
+        return queryset.order_by('id').select_related('user', 'article')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

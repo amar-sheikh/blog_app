@@ -1,5 +1,5 @@
 from app.models import Article, Author, Tag
-from datetime import timedelta
+from datetime import timedelta, datetime
 from django.views.generic import ListView
 from django.utils import timezone
 
@@ -18,11 +18,12 @@ class AuthorListView(ListView):
         tagged = bool(self.request.GET.get('tagged', 0))
         tag_names = self.request.GET.getlist('tag_names[]', None)
 
-        if not date_time:
-            date_time = timezone.now() - timedelta(days=365)
-
         if top_active_authors:
-            return Author.objects.top_active_authors(date_time)
+            if not date_time:
+                date_time = timezone.now() - timedelta(days=365)
+            else:
+                date_time = datetime.fromisoformat(date_time)
+            return Author.objects.top_active_authors(date_time=date_time, tag_names=tag_names)
 
         queryset= Author.objects.all()
 
@@ -39,9 +40,9 @@ class AuthorListView(ListView):
             queryset = queryset.with_tagged_articles(tag_names)
 
         if date_time:
-            queryset = queryset.active_since(date_time)
+            queryset = queryset.active_since(datetime.fromisoformat(date_time))
 
-        return queryset.select_related('user')
+        return queryset.order_by('id').select_related('user')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
