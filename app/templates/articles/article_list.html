@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+	<title>Articles</title>
+	<style>
+		.w-250 {
+			width: 250px;
+		}
+		.w-600 {
+			width: 600px;
+		}
+		.w-400 {
+			width: 400px;
+		}
+		select option:checked {
+			background-color: gray;
+			color: white;
+		}
+	</style>
+</head>
+
+<body>
+	<div>See...<a href="{% url 'authors' %}">Authors</a> and <a href="{% url 'comments' %}">Comments</a></div>
+	<hr>
+	<h2>Filter results</h2>
+	<form action="{% url 'articles' %}" method="get">
+		<div class="container">
+			<div class="row">
+				<div class="col-12 mb-2">
+					<div class="d-flex align-items-center">
+						<label for="search" class="mx-3">Search</label>
+						<input class="form-control" type="text" name="search" placeholder="Search..."
+							value="{{ request.GET.search }}">
+					</div>
+				</div>
+				<div class="col-6 mb-2">
+					<div class="d-flex align-items-center">
+						<div class="mx-3">
+							<label for="days">Select days</label>
+						</div>
+						<div>
+							<input class="form-control w-400" type="number" name="days"
+								placeholder="To filter articles publish in past days" value="{{ request.GET.days }}">
+						</div>
+					</div>
+				</div>
+				<div class="col-6 mb-2">
+					<div class="d-flex align-items-center justify-content-between">
+						<div class="mx-3 w-250">
+							<label for="published">Select publish status</label>
+						</div>
+						<select class="form-control" name="published">
+							<option value="all" {% if request.GET.published == 'all' %}selected{% endif %}>All</option>
+							<option value="True" {% if request.GET.published == 'True' %}selected{% endif %}>Published</option>
+							<option value="False" {% if request.GET.published == 'False' %}selected{% endif %}>Unpublished</option>
+						</select>
+					</div>
+				</div>
+				<div class="col-12 mb-2">
+					<div class="d-flex align-items-center justify-content-between">
+						<div class="mr-3 w-250">
+							<label>Filter by authors</label>
+						</div>
+						<div class="w-100">
+							<select class="form-control" name="author_names[]" multiple>
+								<option value="" disabled>Select</option>
+								{% for author in authors %}
+								<option value="{{ author.user.username }}" {% if author.user.username in selected_author_names %}
+									selected {% endif %}>
+									{{ author.user.username }}
+								</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="col-6 mb-2">
+					<div class="d-flex align-items-center justify-content-between">
+						<div class="mr-3 w-250">
+							<label>Filter tagged articles</label>
+						</div>
+						<div class="w-100">
+							<input type="checkbox" name="tagged" value="1" {% if request.GET.tagged %}checked{% endif %}>
+						</div>
+					</div>
+				</div>
+				<div class="col-6 mb-2">
+					<div class="d-flex align-items-center justify-content-between">
+						<div>
+							<label>Filter by specific tags</label>
+						</div>
+						<div>
+							<select class="form-control" name="tag_names[]" multiple>
+								{% for tag in tags %}
+								<option value="{{ tag.name }}" {% if tag.name in selected_tag_names %} selected {% endif %}>
+									{{ tag.name }}
+								</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="col-6 mb-2">
+					<div class="d-flex align-items-center justify-content-between">
+						<div class="mr-3 w-600">
+							<label for="with_approved_comment">Filter approved commented articles</label>
+						</div>
+						<div class="w-100">
+							<input type="checkbox" name="with_approved_comment" value="1" {% if request.GET.with_approved_comment %}checked{% endif %}>
+						</div>
+					</div>
+				</div>
+				<div class="col-6 mb-2">
+					<div class="d-flex align-items-center justify-content-between">
+						<div class="mr-3 w-250">
+							<label for="comments_count">Enter comments count</label>
+						</div>
+						<div>
+							<input class="form-control" type="number" name="comments_count" value="{{ request.GET.comments_count }}" >
+						</div>
+					</div>
+				</div>
+			</div>
+			<hr>
+			<div class="col-12 mb-2">
+				<div class="d-flex align-items-center justify-content-between">
+					<div class="mr-3 w-250">
+						<label for="special">Special filters</label>
+					</div>
+					<div class="w-100">
+						<select class="form-control" name="special">
+							<option value="" {% if not request.GET.special %}selected{% endif %}>Select</option>
+							<option value="hot" {% if request.GET.special == 'hot' %}selected{% endif %}>Hot</option>
+							<option value="trending" {% if request.GET.special == 'trending' %}selected{% endif %}>Trending</option>
+						</select>
+					</div>
+					<div class="w-600 mx-3">These filters may effect other filters</div>
+				</div>
+			</div>
+			<hr>
+			<div class="text-end">
+				<button class="btn btn-primary" type="submit">Filter results</button>
+			</div>
+		</div>
+	</form>
+	<hr>
+	<div>No. of records found: {{ articles | length }}</div>
+	<hr>
+	<table>
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>AUTHOR_NAME</th>
+				<th>TITLE</th>
+				<th>CONTENT</th>
+				<th>IS_PUBLISHED</th>
+				<th>PUBLISHED_AT</th>
+				<th>FEATURE ARTICLE</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for artice in articles %}
+			<tr>
+				<td>{{artice.pk}}</td>
+				<td>{{artice.author.user.username}}</td>
+				<td>{{artice.title}}</td>
+				<td>{{artice.content}}</td>
+				<td>{{artice.is_published}}</td>
+				<td>{{artice.published_at}}</td>
+				<td>
+					{% if artice.hot %}
+					HOT
+					{% elif artice.trending %}
+					TRENDING
+					{% endif %}
+				</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	<hr>
+	<div class="d-flex justify-content-center">
+		<div class="pagination">
+			{% with request.GET.urlencode as query_string %}
+				<span class="step-links">
+					{% if page_obj.has_previous %}
+						<a href="?{{ query_string }}&page=1">&laquo; first</a>
+						<a href="?{{ query_string }}&page={{ page_obj.previous_page_number }}">previous</a>
+					{% endif %}
+
+					<span class="current">
+						Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+					</span>
+
+					{% if page_obj.has_next %}
+						<a href="?{{ query_string }}&page={{ page_obj.next_page_number }}">next</a>
+						<a href="?{{ query_string }}&page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+					{% endif %}
+				</span>
+			{% endwith %}
+		</div>
+	</div>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
+		crossorigin="anonymous"></script>
+</body>
+
+</html>
