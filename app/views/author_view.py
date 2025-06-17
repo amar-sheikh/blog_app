@@ -42,7 +42,7 @@ class AuthorListView(ListView):
         if date_time:
             queryset = queryset.active_since(datetime.fromisoformat(date_time))
 
-        return queryset.order_by('id').select_related('user')
+        return queryset.order_by('id').select_related('user').distinct()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
